@@ -68,11 +68,20 @@ def run_scheduler():
 def home():
     return "Echor Backend is alive and running!"
 
+# --- START THE SCHEDULER ---
+# We define a function to start it safely
+def start_scheduler_if_not_running():
+    # A simple flag to ensure we don't start it twice
+    if not getattr(app, 'scheduler_started', False):
+        scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+        scheduler_thread.start()
+        app.scheduler_started = True
+        print("🟢 Scheduler thread started!")
+
+# Start it immediately when Gunicorn loads the module
+start_scheduler_if_not_running()
+
 if __name__ == '__main__':
-    # Start the scheduler in a separate background thread
-    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-    scheduler_thread.start()
-    
-    # Run the Flask web server on the port Render expects
+    # This only runs if you test locally with `python server.py`
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
