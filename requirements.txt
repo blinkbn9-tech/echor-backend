@@ -2,3 +2,4 @@ Flask
 gunicorn
 supabase
 google-genai
+python-dotenv
